@@ -6,11 +6,13 @@ using WebKit;
 
 namespace Re
 {
-    public class ValaBrowser : Window {
+    public class Frame : Window {
 
+        //  private const string TITLE = "re/analytics";
+        //  private const string DEFAULT_URL = "http://localhost:8080/";
         private const string TITLE = "re/log";
         private const string DEFAULT_URL = "http://localhost:7000/";
-        private const string DEFAULT_PROTOCOL = "http";
+        //  private const string DEFAULT_URL = "http://localhost:5000";
         public bool has_failed = false;
 
         private Regex protocol_regex;
@@ -19,8 +21,9 @@ namespace Re
         private Gtk.Image splash_image;
         private ScrolledWindow scrolled_window;
 
-        public ValaBrowser () {
-            this.title = ValaBrowser.TITLE;
+        public Frame () {
+            this.title = Frame.TITLE;
+            //  this.icon = new Gdk.Pixbuf.from_file ("/re/analytics/Client/wwwroot/Images/Logo-Lilac-256.png");
             this.icon = new Gdk.Pixbuf.from_file ("/re/log/wwwroot/Images/Logo.png");
             //  this.web_view.set_visible(false);
             set_default_size (1024, 768);
@@ -77,6 +80,7 @@ namespace Re
             scrolled_window = new ScrolledWindow (null, null);
             scrolled_window.set_policy (PolicyType.AUTOMATIC, PolicyType.AUTOMATIC);
             this.splash_image = new Gtk.Image ();
+            //  this.splash_image.set_from_file ("/re/analytics/Client/wwwroot/Images/Logo-Lilac-256.png");
             this.splash_image.set_from_file ("/re/log/wwwroot/Images/Logo.png");
             scrolled_window.add(this.splash_image);
             
@@ -131,11 +135,13 @@ namespace Re
                     this.scrolled_window.add(this.web_view);
                     Thread.usleep (1000000); // Sleep for 1s to let the web page fully load
                     show_all();
+                    this.web_view.grab_focus ();
                 }
             });
         }
 
         public void quit() {
+            //  Process.spawn_command_line_sync("killall Re.Analytics.Server");
             Process.spawn_command_line_sync("killall Re.Log");
             Gtk.main_quit();
         }
@@ -144,19 +150,24 @@ namespace Re
             show_all ();
             //  this.web_view.set_visible(false);
             this.web_view.load_uri (DEFAULT_URL);
+            //  this.web_view.focus (Gtk.DirectionType.DOWN);
+            
         }
 
         public static int main (string[] args) {
             Gtk.init (ref args);
 
+            //  bool res = Process.spawn_command_line_async ("dotnet run --project /re/analytics/Server");
+            //  bool res = Process.spawn_command_line_async ("dotnet run");
+            //  bool res = Process.spawn_command_line_async ("dotnet /re/log/bin/Release/net6.0/Re.Log");
             bool res = Process.spawn_command_line_async ("dotnet run --project /re/log");
             
-            var browser = new ValaBrowser ();
+            var browser = new Frame ();
             browser.start ();
             browser.reload();
-
+            
             Gtk.main ();
-
+            
             return 0;
         }
     }
