@@ -4,7 +4,7 @@ from PyQt6 import QtWidgets, QtWebEngineWidgets, QtWebEngineCore, QtCore
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSplashScreen, QLabel
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage
-from PyQt6.QtCore import QUrl
+from PyQt6.QtCore import QUrl, QTimer
 from PyQt6.QtGui import QDesktopServices, QPixmap
 
 import os
@@ -35,14 +35,29 @@ class OpenLinksInDesktopBrowserWebEnginePage(QWebEnginePage):
 
         return super().acceptNavigationRequest(url, navType, isMainFrame)
 
-class StartServerWorker(QRunnable):
-    @pyqtSlot()
-    def run(self):
-        print("Thread start")
-        time.sleep(5)
-        print("Thread complete")
+# class StartServerWorker(QRunnable):
+#     @pyqtSlot()
+#     def run(self):
+#         print("Thread start")
+#         time.sleep(5)
+#         print("Thread complete")
 
 class MainWindow(QtWidgets.QMainWindow):
+
+    def loadServer(self):
+        if (isReachable("http://localhost:7000/")):
+            self.timer.stop()
+            self.browser.setUrl(QUrl("http://localhost:7000/")) 
+            self.setCentralWidget(self.browser)
+            
+
+    def showSplashscreen(self):
+        label = QLabel(self)
+        icon = QPixmap('icon.png')
+        label.setPixmap(icon)
+        label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
+        self.setCentralWidget(label)
+        self.show()
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
@@ -52,31 +67,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.browser = QWebEngineView()
         self.browser.setPage(OpenLinksInDesktopBrowserWebEnginePage(self))
 
-        label = QLabel(self)
-        icon = QPixmap('icon.png')
-        label.setPixmap(icon)
-        label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
-        self.setCentralWidget(label)
-        self.show()
+        self.showSplashscreen()
         
         if (not isReachable("http://localhost:7000/")):
             subprocess.Popen(["dotnet", "run", "--project", "/re/log"])
-        while not isReachable("http://localhost:7000/"):
-            QApplication.processEvents()
-            time.sleep(1)
 
-        self.browser.setUrl(QUrl("http://localhost:7000/")) 
-        self.setCentralWidget(self.browser)
-        
+        self.timer=QTimer()
+        self.timer.timeout.connect(self.loadServer)
+        self.timer.start(100)
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    # pixmap = QPixmap("/re/window/icon.png")
-    # splash = QSplashScreen(pixmap)
-    # splash.show()
-    # app.processEvents()
-
-    # splash.close()
     w = MainWindow()
     w.show()
     app.exec()
