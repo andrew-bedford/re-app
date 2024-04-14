@@ -5,7 +5,7 @@ from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSplashScreen, Q
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage
 from PyQt6.QtCore import QUrl, QTimer
-from PyQt6.QtGui import QDesktopServices, QPixmap
+from PyQt6.QtGui import QDesktopServices, QPixmap, QIcon
 
 import os
 import sys
@@ -15,15 +15,11 @@ def isReachable(url):
     try:
         request = requests.get(url)
         if request.status_code == 200:
-            print(f"{url}: is reachable")
             return True
         else:
-            print(f"{url}: is Not reachable, status_code: {get.status_code}")
             return False
 
-    #Exception
     except requests.exceptions.RequestException as e:
-        print(f"{url}: is not reachable")
         return False
 
 class OpenLinksInDesktopBrowserWebEnginePage(QWebEnginePage):
@@ -32,15 +28,7 @@ class OpenLinksInDesktopBrowserWebEnginePage(QWebEnginePage):
             # Use the system's default URL handler.
             QDesktopServices.openUrl(url)
             return False
-
         return super().acceptNavigationRequest(url, navType, isMainFrame)
-
-# class StartServerWorker(QRunnable):
-#     @pyqtSlot()
-#     def run(self):
-#         print("Thread start")
-#         time.sleep(5)
-#         print("Thread complete")
 
 class MainWindow(QtWidgets.QMainWindow):
 
@@ -53,8 +41,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def showSplashscreen(self):
         label = QLabel(self)
-        icon = QPixmap('icon.png')
-        label.setPixmap(icon)
+        label.setPixmap(self.icon)
         label.setAlignment(QtCore.Qt.AlignmentFlag.AlignCenter)
         self.setCentralWidget(label)
         self.show()
@@ -63,6 +50,8 @@ class MainWindow(QtWidgets.QMainWindow):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.setWindowTitle("re/window")
         self.resize(1280, 800)
+        self.icon = QPixmap('icon.png')
+        self.setWindowIcon(QIcon(self.icon))
 
         self.browser = QWebEngineView()
         self.browser.setPage(OpenLinksInDesktopBrowserWebEnginePage(self))
