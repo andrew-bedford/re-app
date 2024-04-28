@@ -10,9 +10,6 @@ from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings
 from PyQt6.QtCore import QUrl, QTimer
 from PyQt6.QtGui import QDesktopServices, QPixmap, QIcon
 
-
-
-
 def isReachable(url):
     try:
         request = requests.get(url)
