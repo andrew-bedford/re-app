@@ -1,7 +1,7 @@
 # re/appify
 A simple python script that creates a desktop window using Qt, automatically starts your web app's server locally, displays a splashscreen with your application's logo while it's starting and then load the page in a webview once the server is reachable.
 
-**Note**: Work in progress. It's more of a proof of concept at the moment. It is not configurable without editing the script itself.
+**Note**: Work in progress. It's more of a proof of concept at the moment.
 
 ## Development
 ### Running
@@ -9,6 +9,13 @@ A simple python script that creates a desktop window using Qt, automatically sta
 pip3 install PyQt6 PyQt6-WebEngine
 python app.py
 ```
+
+### Configuration
+To configure your re/app, edit the `config.ini` file that is located in the root. It allows you to specify:
+ - `icon`: Path to the image that is to be used as the taskbar's icon and as the splashscreen.
+ - `title`: The window title to display. At the moment, this window title is static, so it cannot be changed at runtime once the application starts.
+ - `path`: The path to your project on which `dotnet run` will be executed. We may want to update this later to support more than just .NET applications.
+ - `url`: The url of your web application (e.g., https://localhost:12345). Once the server has started, it will load and display the screen. While the local server is starting, the splashscreen will be displayed.
 
 ### Publishing
 To generate an installer for your application, you can use PyInstaller:
