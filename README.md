@@ -1,4 +1,4 @@
-# re/appify
+# re/app
 A simple python script that creates a desktop window using Qt, automatically starts your web app's server locally, displays a splashscreen with your application's logo while it's starting and then load the page in a webview once the server is reachable.
 
 **Note**: Work in progress. It's more of a proof of concept at the moment.
@@ -32,5 +32,5 @@ I was developing .NET web applications that I wanted to run in desktop windows. 
  - [Electron.NET](https://github.com/ElectronNET/) and [SpiderEye](https://github.com/JBildstein/SpiderEye) were a few .NET versions behind, which prevented me from using either.
  - [Photino](https://github.com/tryphotino/photino.NET) seemed promising, but I encountered issues on Windows (application would not load) and on Linux (WebKit quirks).
 
-All I wanted was a cross-platform way to automatically start the application's server and display the page in a window. How hard could it be? This lead me to create re/appify.
+All I wanted was a cross-platform way to automatically start the application's server and display the page in a window. How hard could it be? This lead me to create re/app.
 
