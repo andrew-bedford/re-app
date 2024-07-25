@@ -2,6 +2,7 @@ import os
 import sys
 import requests
 import subprocess
+import configparser
 
 from PyQt6 import QtWidgets, QtWebEngineWidgets, QtWebEngineCore, QtCore
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSplashScreen, QLabel
@@ -30,11 +31,18 @@ class OpenLinksInDesktopBrowserWebEnginePage(QWebEnginePage):
         return super().acceptNavigationRequest(url, navType, isMainFrame)
 
 class MainWindow(QtWidgets.QMainWindow):
+    def loadConfig(self):
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        self.iconPath = config.get('App', 'icon')
+        self.path = config.get('App', 'path')
+        self.title = config.get('App', 'title')
+        self.url = config.get('App', 'url')
 
     def loadServer(self):
-        if (isReachable("http://localhost:7000/")):
+        if (isReachable(self.url)):
             self.timer.stop()
-            self.browser.setUrl(QUrl("http://localhost:7000/")) 
+            self.browser.setUrl(QUrl(self.url)) 
             self.setCentralWidget(self.browser)
             
 
@@ -47,9 +55,10 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
-        self.setWindowTitle("re/window")
+        self.loadConfig()
+        self.setWindowTitle(self.title)
         self.resize(1280, 800)
-        self.icon = QPixmap(os.path.join(workingDirectory, 'icon.png'))
+        self.icon = QPixmap(self.iconPath)
         self.setWindowIcon(QIcon(self.icon))
 
         self.browser = QWebEngineView()
@@ -69,8 +78,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.showSplashscreen()
         
-        if (not isReachable("http://localhost:7000/")):
-            subprocess.Popen(["dotnet", "run", "--project", "/re/log"])
+        if (not isReachable(self.url)):
+            subprocess.Popen(["dotnet", "run", "--project", self.path])
 
         self.timer=QTimer()
         self.timer.timeout.connect(self.loadServer)
