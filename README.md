@@ -21,7 +21,7 @@ To configure your re/app, edit the `config.ini` file that is located in the root
 To generate an installer for your application, you can use PyInstaller:
 ```
 pip3 install PyInstaller
-pyinstaller app.py
+pyinstaller app.spec
 ```
 Note that it has to be run on the platform that you are targeting (e.g., on Windows for a Windows installer).
 

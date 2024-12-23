@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 import os
 import sys
+import time
 import requests
 import subprocess
 import configparser
 
 from PyQt6 import QtWidgets, QtWebEngineWidgets, QtWebEngineCore, QtCore
-from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSplashScreen, QLabel
+from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSplashScreen, QLabel, QSizePolicy
 from PyQt6.QtWebEngineWidgets import QWebEngineView
 from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings, QWebEngineProfile
 from PyQt6.QtCore import QUrl, QTimer
@@ -34,7 +35,7 @@ class OpenLinksInDesktopBrowserWebEnginePage(QWebEnginePage):
 class MainWindow(QtWidgets.QMainWindow):
     def loadConfig(self):
         config = configparser.ConfigParser()
-        config.read('config.ini')
+        config.read('_internal/config.ini')
         self.iconPath = config.get('App', 'icon')
         self.path = config.get('App', 'path')
         self.title = config.get('App', 'title')
@@ -43,9 +44,19 @@ class MainWindow(QtWidgets.QMainWindow):
     def loadServer(self):
         if (isReachable(self.url)):
             self.timer.stop()
-            self.browser.setUrl(QUrl(self.url)) 
-            self.setCentralWidget(self.browser)
-            
+            self.browser.setUrl(QUrl(self.url))
+            self.browser.loadFinished.connect(self.delayedShowBrowser)
+
+    # We introduce a small delay to give the pages a bit more time to render
+    # after loading.
+    def delayedShowBrowser(self):
+        self.timer=QTimer()
+        self.timer.timeout.connect(self.showBrowser)
+        self.timer.start(100)
+
+    def showBrowser(self):
+        self.timer.stop()
+        self.setCentralWidget(self.browser)
 
     def showSplashscreen(self):
         label = QLabel(self)
@@ -62,9 +73,11 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
+        # self.setWindowFlags(QtCore.Qt.WindowType.FramelessWindowHint) # For a frameless window
+        self.setSizePolicy(QSizePolicy.Policy.Ignored, QSizePolicy.Policy.Fixed) # Prevents the window from resizing when changing the central widget
         self.loadConfig()
         self.setWindowTitle(self.title)
-        self.resize(1280, 800)
+        self.resize(self.screen().geometry().width(), self.screen().geometry().height()) # Use screen dimensions as default window size
         self.icon = QPixmap(self.iconPath)
         self.setWindowIcon(QIcon(self.icon))
 
@@ -101,10 +114,10 @@ if __name__ == '__main__':
     # QtWebEngine dictionaries are required for spell checking.
     workingDirectory = os.path.dirname(os.path.realpath(__file__))
     os.environ["QTWEBENGINE_DICTIONARIES_PATH"] = os.path.join(
-        workingDirectory, "qtwebengine_dictionaries"
+        workingDirectory, "_internal", "qtwebengine_dictionaries"
     )
 
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
-    window.show()
+    window.showMaximized()
     app.exec()
