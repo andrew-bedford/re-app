@@ -1,3 +1,4 @@
+#!/usr/bin/python3
 import os
 import sys
 import requests
@@ -53,6 +54,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setCentralWidget(label)
         self.show()
 
+    # FIXME: Unsuccessful tentative to get (optional) spell checking working.
+    def enableSpellCheck(self):
+        profile = self.browser.page().profile()
+        profile.setSpellCheckEnabled = True
+        profile.setSpellCheckLanguages = ["en-US"]
+
     def __init__(self, *args, **kwargs):
         super(MainWindow, self).__init__(*args, **kwargs)
         self.loadConfig()
@@ -86,7 +93,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timer.start(100)
 
 if __name__ == '__main__':
-    workingDirectory = os.path.abspath(os.path.dirname(__file__))
+    # The QtWebEngine dictionaries are required for spell checking.
+    workingDirectory = os.path.dirname(os.path.realpath(__file__))
+    os.environ["QTWEBENGINE_DICTIONARIES_PATH"] = os.path.join(
+        workingDirectory, "qtwebengine_dictionaries"
+    )
+
     app = QtWidgets.QApplication(sys.argv)
     window = MainWindow()
     window.show()
