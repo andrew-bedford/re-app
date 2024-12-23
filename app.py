@@ -25,6 +25,14 @@ def isReachable(url):
         return False
 
 class OpenLinksInDesktopBrowserWebEnginePage(QWebEnginePage):
+    def __init__(self, webengine_view):
+        # Enable persistent local storage
+        # TODO: Use a slug of the application's name instead of "persistent" to avoid conflicts
+        #       with other applications. To get the location where the data is being saved:
+        #       `self.browser.page().profile().persistentStoragePath()`
+        persistent_profile = QWebEngineProfile("persistent", webengine_view)
+        super().__init__(persistent_profile, webengine_view)
+
     def acceptNavigationRequest(self, url, navType, isMainFrame):
         if (navType == QWebEnginePage.NavigationType.NavigationTypeLinkClicked):
             # Use the system's default URL handler.
@@ -91,14 +99,8 @@ class MainWindow(QtWidgets.QMainWindow):
         self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
         self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptCanAccessClipboard, True)
 
-        # Enable persistent local storage
-        # TODO: Use a slug of the application's name instead of "persistent" to avoid conflicts
-        #       with other applications. To get the location where the data is being saved:
-        #       `self.browser.page().profile().persistentStoragePath()`
-        persistent_profile = QWebEngineProfile("persistent", self.browser)
-        persistent_page = QWebEnginePage(persistent_profile, self.browser)
-        self.browser.setPage(persistent_page)
-        # self.browser.setPage(OpenLinksInDesktopBrowserWebEnginePage(self))
+        self.browser.setPage(OpenLinksInDesktopBrowserWebEnginePage(self.browser))
+        print(self.browser.page().profile().persistentStoragePath())
         self.browser.page().quotaRequested.connect(lambda request: request.accept())
 
         self.showSplashscreen()
