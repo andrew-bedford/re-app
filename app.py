@@ -8,7 +8,7 @@ import configparser
 from PyQt6 import QtWidgets, QtWebEngineWidgets, QtWebEngineCore, QtCore
 from PyQt6.QtWidgets import QApplication, QWidget, QVBoxLayout, QSplashScreen, QLabel
 from PyQt6.QtWebEngineWidgets import QWebEngineView
-from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings
+from PyQt6.QtWebEngineCore import QWebEnginePage, QWebEngineSettings, QWebEngineProfile
 from PyQt6.QtCore import QUrl, QTimer
 from PyQt6.QtGui import QDesktopServices, QPixmap, QIcon
 
@@ -69,9 +69,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setWindowIcon(QIcon(self.icon))
 
         self.browser = QWebEngineView()
-        self.browser.setPage(OpenLinksInDesktopBrowserWebEnginePage(self))
-
-        # Attemps at making local storage work, it might be better to just save the data to a local file instead.
         self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalStorageEnabled, True)
         self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.PdfViewerEnabled, True)
         self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.PluginsEnabled, True)
@@ -81,6 +78,14 @@ class MainWindow(QtWidgets.QMainWindow):
         self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.LocalContentCanAccessFileUrls, True)
         self.browser.settings().setAttribute(QWebEngineSettings.WebAttribute.JavascriptCanAccessClipboard, True)
 
+        # Enable persistent local storage
+        # TODO: Use a slug of the application's name instead of "persistent" to avoid conflicts
+        #       with other applications. To get the location where the data is being saved:
+        #       `self.browser.page().profile().persistentStoragePath()`
+        persistent_profile = QWebEngineProfile("persistent", self.browser)
+        persistent_page = QWebEnginePage(persistent_profile, self.browser)
+        self.browser.setPage(persistent_page)
+        # self.browser.setPage(OpenLinksInDesktopBrowserWebEnginePage(self))
         self.browser.page().quotaRequested.connect(lambda request: request.accept())
 
         self.showSplashscreen()
@@ -93,7 +98,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.timer.start(100)
 
 if __name__ == '__main__':
-    # The QtWebEngine dictionaries are required for spell checking.
+    # QtWebEngine dictionaries are required for spell checking.
     workingDirectory = os.path.dirname(os.path.realpath(__file__))
     os.environ["QTWEBENGINE_DICTIONARIES_PATH"] = os.path.join(
         workingDirectory, "qtwebengine_dictionaries"
