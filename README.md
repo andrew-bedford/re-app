@@ -1,5 +1,7 @@
 # re/app
-A simple python script that creates a desktop window using Qt, automatically starts your web app's server locally, displays a splashscreen with your application's logo while it's starting and then load the page in a webview once the server is reachable.
+A simple python script that creates a desktop window using Qt, automatically starts your web app's server locally, displays a splashscreen with your application's logo while it's starting and then load the page in a webview once the server is reachable. Supports an acrylic-like effect through [pyqt-hackrylic](https://github.com/andrew-bedford/pyqt-hackrylic/).
+
+![](https://github.com/andrew-bedford/pyqt-hackrylic/raw/main/Screenshots/QWebEngine.jpg)
 
 **Note**: Work in progress. It's more of a proof of concept at the moment.
 
@@ -11,7 +13,7 @@ python app.py
 ```
 
 ### Configuration
-To configure your re/app, edit the `config.ini` file that is located in the root. It allows you to specify:
+To configure your re/app, edit the `config.ini` file that is located in the `_internal`. It allows you to specify:
  - `icon`: Path to the image that is to be used as the taskbar's icon and as the splashscreen.
  - `title`: The window title to display. At the moment, this window title is static, so it cannot be changed at runtime once the application starts.
  - `path`: The path to your project on which `dotnet run` will be executed. We may want to update this later to support more than just .NET applications.
