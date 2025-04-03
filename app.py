@@ -54,6 +54,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.path = config.get('App', 'path')
         self.title = config.get('App', 'title')
         self.url = config.get('App', 'url')
+        self.close_confirmation = config.get('App', 'close_confirmation', fallback=None)
 
     def loadServer(self):
         if (isReachable(self.url)):
@@ -172,6 +173,18 @@ class MainWindow(QtWidgets.QMainWindow):
                 super().changeEvent(event)
 
             self.previousWindowState = self.windowState()
+
+    def closeEvent(self, event):
+        if self.close_confirmation:
+            reply = QtWidgets.QMessageBox.question(self, 'Confirm Exit', 'Are you sure you want to exit?',
+                                                   QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
+                                                   QtWidgets.QMessageBox.StandardButton.No)
+            if reply == QtWidgets.QMessageBox.StandardButton.Yes:
+                event.accept()
+            else:
+                event.ignore()
+        else:
+            event.accept()
 
 if __name__ == '__main__':
     # QtWebEngine dictionaries are required for spell checking.
