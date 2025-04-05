@@ -176,7 +176,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def closeEvent(self, event):
         if self.close_confirmation:
-            reply = QtWidgets.QMessageBox.question(self, 'Confirm Exit', 'Are you sure you want to exit?',
+            reply = QtWidgets.QMessageBox.question(self, 'Confirm Exit', self.close_confirmation,
                                                    QtWidgets.QMessageBox.StandardButton.Yes | QtWidgets.QMessageBox.StandardButton.No,
                                                    QtWidgets.QMessageBox.StandardButton.No)
             if reply == QtWidgets.QMessageBox.StandardButton.Yes:
